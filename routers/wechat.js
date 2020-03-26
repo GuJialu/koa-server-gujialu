@@ -6,14 +6,18 @@ const token = 'gujialu';
 
 router.get('/', async (ctx, next) => {
     console.log(ctx.query);
-    const {signature, echostr, timestamp, nonce}  = ctx.query;
-    const str = [token, timestamp, nonce].sort((a, b)=>a>b).join('');
+    const { signature, echostr, timestamp, nonce } = ctx.query;
+    const str = ([token, timestamp, nonce].sort((a, b) => a.localeCompare(b)===1)).join('');
+    console.log(str);
 
     const sha1 = crypto.createHash('sha1');
     sha1.update(str);
     const hashedStr = sha1.digest('hex');
 
-    if(signature === hashedStr){
+    console.log(hashedStr);
+    console.log(hashedStr === signature);
+
+    if (signature === hashedStr) {
         ctx.body = echostr;
     }
 })
