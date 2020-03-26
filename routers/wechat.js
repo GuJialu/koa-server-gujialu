@@ -1,8 +1,8 @@
 const Router = require('@koa/router');
-const router = new Router({ prefix: '/user' })
+const router = new Router()
 
 router.get('/', async (ctx, next) => {
-    ctx.body = 'Some User'
+    console.log(ctx.request.body);
 })
 
 module.exports = router;
