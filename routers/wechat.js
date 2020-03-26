@@ -1,27 +1,38 @@
 const Router = require('@koa/router');
 const crypto = require('crypto');
-const router = new Router()
+const router = new Router({prefix: '/dev'});
 
 const token = 'gujialu';
 
-router.get('/', async (ctx, next) => {
+function checkSignature(ctx) {
     console.log(ctx.query);
     const { signature, echostr, timestamp, nonce } = ctx.query;
     const str = [token, timestamp, nonce].sort().join('');
-    console.log(str);
 
     const sha1 = crypto.createHash('sha1');
-    sha1.update(str);
     const hashedStr = sha1.digest('hex');
 
-    console.log(hashedStr);
-    console.log(hashedStr === signature);
+    return hashedStr === signature;
+}
 
-    if (signature === hashedStr) {
+router.get('/', async (ctx, next) => {
+    if (checkSignature(ctx)) {
         ctx.body = echostr;
-    }else{
+    } else {
         ctx.body = 'signature not match';
     }
+})
+
+router.post('/', async (ctx, next) => {
+    if (!checkSignature(ctx)) {
+        ctx.body = 'signature not match';
+    }
+    console.log(ctx.request.body);
+    ctx.body = ctx.request.body;
+})
+
+router.get('/welcome', async (ctx, next) => {
+    ctx.body = 'welcome';
 })
 
 module.exports = router;
